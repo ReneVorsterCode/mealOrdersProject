@@ -6,6 +6,7 @@
 // point 4.2 because I would have no use for it.
 let sessionData;
 let mainIngredient;
+let mainIngredientReformatted;
 let currentOrders = [];
 
 //We create our foodOrder class constructor
@@ -63,17 +64,16 @@ async function returnRandomMeal(ingredient) {
 					alert("Invalid entry provided.");
 			}
 		} while (!mainIngredient);
-		mainIngredient.toLowerCase().replace(" ", "_");
+		mainIngredientReformatted = mainIngredient.toLowerCase();
+		mainIngredientReformatted = mainIngredientReformatted.replace(" ", "_");
 
 		// Recursion on current function to handle api call and picking of random meal again.
-		returnRandomMeal(mainIngredient);
+		returnRandomMeal(mainIngredientReformatted);
 	} else {
 		// If the chosenMeal was a valid option, we create a new foodOrder with description, orderNumber, and preparation status.
 		// We then push it to currentOrders array and stringify onto sessionStorage to save.
 		currentOrders.push(new foodOrder(chosenMeal.strMeal, `OR${currentOrders.length + 1}`, "incomplete"));
 		sessionStorage.setItem("sessionCurrentOrders", JSON.stringify(currentOrders));
-
-		console.log(currentOrders.length);
 		// We call showIncomplete Orders after getting a random meal and pushing to currentOrders array
 		showIncompleteOrders();
 	}
@@ -144,6 +144,8 @@ function showIncompleteOrders() {
 
 // Iterate through our currentOrders and if the order number matches the input order number
 // we change its completionStatus to completed.
+// We don't need to error handle here, as when we prompt for the orderNumber from client
+// in showIncompleteOrders(), we are already handling incorrect inputs.
 function markOrderComplete(orderNumber) {
 	for (const element of currentOrders) {
 		if (element.orderNumber === orderNumber)
@@ -168,9 +170,11 @@ do {
 } while (!mainIngredient);
 // After something valid is entered, we toLowerCase and replace spaces with "_"
 // We do this AFTER our do-while to avoid errors being through from trying to toLowerCase
-// null/undefined inputs.
-mainIngredient.toLowerCase().replace(" ", "_");
+// null/undefined inputs. We use mainIngredientReformatted, so we can keep mainIngredient
+// as the user entered it for display back to them in case of errors.
+mainIngredientReformatted = mainIngredient.toLowerCase();
+mainIngredientReformatted = mainIngredientReformatted.replace(" ", "_");
 
 // Finally, call returnRandomMeal which starts the chain of api calling for all meals,
 // choosing a random one, and adding it to our currentOrders array.
-returnRandomMeal(mainIngredient);
+returnRandomMeal(mainIngredientReformatted);
